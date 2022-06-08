@@ -13,7 +13,7 @@ use Slim\Routing\RouteContext;
 require __DIR__ . '/../vendor/autoload.php';
 
 require_once './db/AccesoDatos.php';
-// require_once './middlewares/Logger.php';
+require_once './middlewares/Logger.php';
 
 require_once './controllers/UsuarioController.php';
 
@@ -35,12 +35,22 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
     $group->get('[/]', \UsuarioController::class . ':TraerTodos');
     $group->get('/{usuario}', \UsuarioController::class . ':TraerUno');
     $group->post('[/]', \UsuarioController::class . ':CargarUno');
-  });
+  })->add(\Logger::class . ':LogOperacion');
 
-$app->get('[/]', function (Request $request, Response $response) {    
-    $response->getBody()->write("Slim Framework 4 PHP");
-    return $response;
+  $app->group('/credenciales', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \UsuarioController::class . ':TraerTodos');
+    $group->post('[/]', \UsuarioController::class . ':CargarUnoBis');
+  })->add(\Logger::class . ':verificarCredenciales');
 
-});
+  $app->group('/json', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \UsuarioController::class . ':TraerTodos');
+    $group->post('[/]', \UsuarioController::class . ':CargarUnoBis')->add(\Logger::class . ':devolverMetodo');
+  })->add(\Logger::class . ':verificarCredenciales');
+
+// $app->get('[/]', function (Request $request, Response $response) {    
+//     $response->getBody()->write("Slim Framework 4 PHP");
+//     return $response;
+
+// });
 
 $app->run();
